@@ -4,21 +4,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
     <style>
-        head {
+        .banner {
             background-image: url('banner.png');
-            background-color: black;
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
-            margin: 0;
+            height: 300px;          /* this is what makes it visible */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
+        body {
+            background-color: black;
+        }
+        
         h1 {
             color: white;
             font-family: "Audiowide", sans-serif;
             font-weight: 400;
             font-style: normal;
         }
+        
         .linkboxes {
             color: white;
             font-family: "Audiowide", sans-serif;
@@ -32,10 +39,13 @@
             text-align: center;
             
         }
+        
     </style>
-    <head>
+    
+    <header class="banner">
         <h1 style="text-align: center; ">KTdaCOCONUT YouTube Page</h1>
-    </head>
+    </header>
+    
     <body>
         <div class="linkboxes">
             <a href="https://www.youtube.com/channel/UC4-CXIt7ebGXya6o-B6Iz3A">Click</a>
