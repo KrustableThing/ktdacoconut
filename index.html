@@ -207,6 +207,35 @@
             max-width: none;
             box-sizing: border-box;
         }
+
+        /* LIKE + REPLY */
+        .comment-actions { margin-top: 10px; display: flex; gap: 10px; }
+        .comments .comment-actions button {
+            padding: 4px 14px;
+            font-size: 13px;
+            border: 1px solid #00f0ff;
+            border-radius: 999px;
+        }
+        .comments .comment-actions button:hover { box-shadow: 0 0 10px #00f0ff; }
+        .comments .like-btn.liked {
+            border-color: #ff00cc;
+            color: #ff00cc;
+            box-shadow: 0 0 8px #ff00cc;
+        }
+        .replies {
+            margin-top: 12px;
+            margin-left: 14px;
+            padding-left: 12px;
+            border-left: 2px solid rgba(255, 0, 204, 0.5);
+        }
+        .comment.reply { border-left-color: #ff00cc; background: rgba(255, 255, 255, 0.04); }
+        .reply-form { margin-top: 12px; }
+        .comments .reply-form input,
+        .comments .reply-form textarea { font-size: 14px; }
+        .comments .reply-form textarea { min-height: 60px; }
+        .comments .reply-form button { padding: 8px 20px; font-size: 14px; }
+        .comments .reply-form button + button { margin-left: 8px; }
+ 
     </style>
     
     <script type="module">
@@ -290,7 +319,7 @@
 
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, increment, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
      
         const firebaseConfig = {
             apiKey: "AIzaSyBdVqpIxta_MpmzwbDqV3oQQOT5eRTrePo",
@@ -301,10 +330,12 @@
             appId: "1:1048964398169:web:8cf28f116c607ea9cc8548"
         };
      
-        const COOLDOWN_SECONDS = 30;   // wait time between comments from the same browser
-        const SHOW_LAST = 50;          // how many comments to show
+        const COOLDOWN_SECONDS = 30;   // wait time between posts from the same browser
+        const SHOW_LAST = 200;         // how many comments + replies to load
+        const K_LAST = "ktdacoconut_comment_last";
+        const K_NAME = "ktdacoconut_comment_name";
+        const K_LIKED = "ktdacoconut_comment_liked";
      
-        // Reuses the app the poll already created, or makes one if the poll isn't on this page
         const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const commentsRef = collection(db, "comments");
@@ -316,29 +347,44 @@
         const statusEl = document.getElementById("comment-status");
         const listEl = document.getElementById("comment-list");
      
-        try { nameEl.value = localStorage.getItem("ktdacoconut_comment_name") || ""; } catch (e) {}
+        let allDocs = [];
+        let replyTo = null;                       // id of the comment whose reply box is open
+        let draft = { name: "", text: "", status: "" };
+        const pendingLikes = new Set();
+        let liked = new Set();
+        try { liked = new Set(JSON.parse(localStorage.getItem(K_LIKED) || "[]")); } catch (e) {}
+        try { nameEl.value = localStorage.getItem(K_NAME) || ""; } catch (e) {}
      
+        function cooldownLeft() {
+            let last = 0;
+            try { last = Number(localStorage.getItem(K_LAST) || 0); } catch (e) {}
+            return Math.ceil(COOLDOWN_SECONDS - (Date.now() - last) / 1000);
+        }
+        function rememberPost(name) {
+            try {
+                localStorage.setItem(K_LAST, String(Date.now()));
+                localStorage.setItem(K_NAME, name);
+            } catch (e) {}
+        }
+        function post(name, text, parentId) {
+            return addDoc(commentsRef, { name, text, parentId: parentId || null, likes: 0, createdAt: serverTimestamp() });
+        }
+     
+        // ----- new top-level comment -----
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
             const name = nameEl.value.trim();
             const text = textEl.value.trim();
             if (!name || !text) return;
-     
-            let last = 0;
-            try { last = Number(localStorage.getItem("ktdacoconut_comment_last") || 0); } catch (err) {}
-            const wait = Math.ceil(COOLDOWN_SECONDS - (Date.now() - last) / 1000);
+            const wait = cooldownLeft();
             if (wait > 0) { statusEl.textContent = "Please wait " + wait + "s before posting again."; return; }
-     
             btn.disabled = true;
             statusEl.textContent = "Posting...";
             try {
-                await addDoc(commentsRef, { name, text, createdAt: serverTimestamp() });
+                await post(name, text, null);
                 textEl.value = "";
                 statusEl.textContent = "Posted!";
-                try {
-                    localStorage.setItem("ktdacoconut_comment_last", String(Date.now()));
-                    localStorage.setItem("ktdacoconut_comment_name", name);
-                } catch (err) {}
+                rememberPost(name);
             } catch (err) {
                 console.error(err);
                 statusEl.textContent = "Couldn't post. Try again later.";
@@ -346,32 +392,136 @@
             btn.disabled = false;
         });
      
-        const q = query(commentsRef, orderBy("createdAt", "desc"), limit(SHOW_LAST));
-        onSnapshot(q, (snap) => {
+        // ----- like / unlike -----
+        async function toggleLike(id) {
+            if (pendingLikes.has(id)) return;
+            pendingLikes.add(id);
+            const wasLiked = liked.has(id);
+            try {
+                await updateDoc(doc(db, "comments", id), { likes: increment(wasLiked ? -1 : 1) });
+                if (wasLiked) liked.delete(id); else liked.add(id);
+                try { localStorage.setItem(K_LIKED, JSON.stringify([...liked])); } catch (e) {}
+            } catch (err) {
+                console.error(err);
+            }
+            pendingLikes.delete(id);
+            render();
+        }
+     
+        // ----- building the page -----
+        function buildComment(c, isReply) {
+            const box = document.createElement("div");
+            box.className = "comment" + (isReply ? " reply" : "");
+            const who = document.createElement("span");
+            who.className = "who";
+            who.textContent = c.name;                       // textContent keeps visitors from injecting HTML
+            const when = document.createElement("span");
+            when.className = "when";
+            if (c.createdAt) when.textContent = c.createdAt.toDate().toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+            const msg = document.createElement("p");
+            msg.className = "msg";
+            msg.textContent = c.text;
+     
+            const actions = document.createElement("div");
+            actions.className = "comment-actions";
+            const like = document.createElement("button");
+            like.type = "button";
+            like.className = "like-btn" + (liked.has(c.id) ? " liked" : "");
+            like.textContent = "♥ " + (c.likes || 0);
+            like.addEventListener("click", () => toggleLike(c.id));
+            actions.appendChild(like);
+            if (!isReply) {
+                const rb = document.createElement("button");
+                rb.type = "button";
+                rb.className = "reply-btn";
+                rb.textContent = "Reply";
+                rb.addEventListener("click", () => {
+                    replyTo = (replyTo === c.id) ? null : c.id;
+                    draft = { name: nameEl.value.trim(), text: "", status: "" };
+                    render();
+                    const t = listEl.querySelector(".reply-text");
+                    if (t) t.focus();
+                });
+                actions.appendChild(rb);
+            }
+            box.append(who, when, msg, actions);
+            return box;
+        }
+     
+        function buildReplyForm(parentId) {
+            const wrap = document.createElement("div");
+            wrap.className = "reply-form";
+            const n = document.createElement("input");
+            n.type = "text"; n.placeholder = "Your name"; n.maxLength = 30; n.value = draft.name;
+            n.addEventListener("input", () => { draft.name = n.value; });
+            const t = document.createElement("textarea");
+            t.className = "reply-text"; t.placeholder = "Write a reply..."; t.maxLength = 500; t.value = draft.text;
+            t.addEventListener("input", () => { draft.text = t.value; });
+            const send = document.createElement("button");
+            send.type = "button"; send.textContent = "Send";
+            const cancel = document.createElement("button");
+            cancel.type = "button"; cancel.textContent = "Cancel";
+            const st = document.createElement("span");
+            st.className = "comment-status"; st.textContent = draft.status;
+            cancel.addEventListener("click", () => { replyTo = null; render(); });
+            send.addEventListener("click", async () => {
+                const name = n.value.trim(), text = t.value.trim();
+                if (!name || !text) { st.textContent = "Add a name and a reply."; draft.status = st.textContent; return; }
+                const wait = cooldownLeft();
+                if (wait > 0) { st.textContent = "Please wait " + wait + "s before posting again."; draft.status = st.textContent; return; }
+                send.disabled = true; st.textContent = "Posting...";
+                try {
+                    await post(name, text, parentId);
+                    rememberPost(name);
+                    replyTo = null;
+                    draft = { name: "", text: "", status: "" };
+                    render();
+                } catch (err) {
+                    console.error(err);
+                    st.textContent = "Couldn't post. Try again later.";
+                    draft.status = st.textContent;
+                    send.disabled = false;
+                }
+            });
+            wrap.append(n, t, send, cancel, st);
+            return wrap;
+        }
+     
+        function render() {
+            const hadFocus = document.activeElement && document.activeElement.classList.contains("reply-text");
             listEl.textContent = "";
-            if (snap.empty) {
+            const tops = allDocs.filter(c => !c.parentId);
+            const kids = {};
+            allDocs.filter(c => c.parentId).forEach(c => { (kids[c.parentId] = kids[c.parentId] || []).push(c); });
+            if (!tops.length) {
                 const p = document.createElement("p");
                 p.className = "comment-empty";
                 p.textContent = "No comments yet. Be the first!";
                 listEl.appendChild(p);
                 return;
             }
-            snap.forEach((d) => {
-                const c = d.data();
-                const box = document.createElement("div");
-                box.className = "comment";
-                const who = document.createElement("span");
-                who.className = "who";
-                who.textContent = c.name;                       
-                const when = document.createElement("span");
-                when.className = "when";
-                if (c.createdAt) when.textContent = c.createdAt.toDate().toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
-                const msg = document.createElement("p");
-                msg.className = "msg";
-                msg.textContent = c.text;
-                box.append(who, when, msg);
+            tops.forEach(c => {
+                const box = buildComment(c, false);
+                const replies = (kids[c.id] || []).slice().reverse();   // oldest reply first
+                if (replies.length || replyTo === c.id) {
+                    const holder = document.createElement("div");
+                    holder.className = "replies";
+                    replies.forEach(r => holder.appendChild(buildComment(r, true)));
+                    if (replyTo === c.id) holder.appendChild(buildReplyForm(c.id));
+                    box.appendChild(holder);
+                }
                 listEl.appendChild(box);
             });
+            if (hadFocus) {
+                const t = listEl.querySelector(".reply-text");
+                if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); }
+            }
+        }
+     
+        const q = query(commentsRef, orderBy("createdAt", "desc"), limit(SHOW_LAST));
+        onSnapshot(q, (snap) => {
+            allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            render();
         }, (err) => {
             console.error(err);
             listEl.textContent = "Couldn't load comments.";
