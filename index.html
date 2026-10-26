@@ -70,55 +70,124 @@
         }
 
         /* POLL */
-    .poll {
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 24px;
-        border: 4px solid #00f0ff;
-        border-radius: 20px;
-        box-shadow: 0 0 15px #00f0ff, 0 0 30px #ff00cc;
-        background-color: rgba(0, 0, 0, 0.6);
-        font-family: "Audiowide", sans-serif;
-        color: white;
-    }
-    .poll h2 {
-        text-align: center;
-        margin: 0 0 20px;
-        text-shadow: 0 0 10px #ff00cc;
-    }
-    .poll-option {
-        position: relative;
-        display: block;
-        width: 100%;
-        margin: 10px 0;
-        padding: 14px 16px;
-        border: 2px solid #00f0ff;
-        border-radius: 12px;
-        background: transparent;
-        color: white;
-        font-family: inherit;
-        font-size: 18px;
-        text-align: left;
-        cursor: pointer;
-        overflow: hidden;
-        transition: box-shadow 0.2s;
-    }
-    .poll-option:hover { box-shadow: 0 0 12px #00f0ff; }
-    .poll-option .bar {
-        position: absolute;
-        left: 0; top: 0; bottom: 0;
-        width: 0%;
-        background: linear-gradient(90deg, rgba(0,240,255,0.55), rgba(255,0,204,0.55));
-        transition: width 0.8s ease;
-        z-index: 0;
-    }
-    .poll-option .label, .poll-option .pct { position: relative; z-index: 1; }
-    .poll-option .pct { float: right; }
-    .poll-option.voted { border-color: #ff00cc; box-shadow: 0 0 12px #ff00cc; }
-    .poll.show-results .poll-option { cursor: default; }
-    .poll-total { text-align: center; margin-top: 14px; font-size: 14px; opacity: 0.85; }
-    .poll-msg { text-align: center; margin-top: 8px; font-size: 14px; color: #00f0ff; }
-        
+        .poll {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 24px;
+            border: 4px solid #00f0ff;
+            border-radius: 20px;
+            box-shadow: 0 0 15px #00f0ff, 0 0 30px #ff00cc;
+            background-color: rgba(0, 0, 0, 0.6);
+            font-family: "Audiowide", sans-serif;
+            color: white;
+        }
+        .poll h2 {
+            text-align: center;
+            margin: 0 0 20px;
+            text-shadow: 0 0 10px #ff00cc;
+        }
+        .poll-option {
+            position: relative;
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 14px 16px;
+            border: 2px solid #00f0ff;
+            border-radius: 12px;
+            background: transparent;
+            color: white;
+            font-family: inherit;
+            font-size: 18px;
+            text-align: left;
+            cursor: pointer;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .poll-option:hover { box-shadow: 0 0 12px #00f0ff; }
+        .poll-option .bar {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(0,240,255,0.55), rgba(255,0,204,0.55));
+            transition: width 0.8s ease;
+            z-index: 0;
+        }
+        .poll-option .label, .poll-option .pct { position: relative; z-index: 1; }
+        .poll-option .pct { float: right; }
+        .poll-option.voted { border-color: #ff00cc; box-shadow: 0 0 12px #ff00cc; }
+        .poll.show-results .poll-option { cursor: default; }
+        .poll-total { text-align: center; margin-top: 14px; font-size: 14px; opacity: 0.85; }
+        .poll-msg { text-align: center; margin-top: 8px; font-size: 14px; color: #00f0ff; }
+
+
+        /* COMMENTS */
+        .comments {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 24px;
+            border: 4px solid #ff00cc;
+            border-radius: 20px;
+            box-shadow: 0 0 15px #ff00cc, 0 0 30px #00f0ff;
+            background-color: rgba(0, 0, 0, 0.6);
+            font-family: "Audiowide", sans-serif;
+            color: white;
+        }
+        .comments h2 {
+            text-align: center;
+            margin: 0 0 20px;
+            text-shadow: 0 0 10px #00f0ff;
+        }
+        .comments input, .comments textarea {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            padding: 12px;
+            border: 2px solid #00f0ff;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-family: inherit;
+            font-size: 16px;
+        }
+        .comments textarea { min-height: 90px; resize: vertical; }
+        .comments input:focus, .comments textarea:focus {
+            outline: none;
+            box-shadow: 0 0 12px #00f0ff;
+        }
+        .comments button {
+            padding: 12px 28px;
+            border: 2px solid #ff00cc;
+            border-radius: 999px;
+            background: transparent;
+            color: white;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        .comments button:hover { box-shadow: 0 0 14px #ff00cc; }
+        .comments button:disabled { opacity: 0.5; cursor: default; }
+        .comment-status { margin-left: 12px; font-size: 14px; color: #00f0ff; }
+        .comment-list { margin-top: 24px; }
+        .comment {
+            padding: 14px;
+            margin-bottom: 12px;
+            border-left: 4px solid #00f0ff;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .comment .who { color: #00f0ff; font-size: 16px; }
+        .comment .when { margin-left: 8px; font-size: 12px; opacity: 0.6; }
+        .comment .msg {
+            margin: 8px 0 0;
+            font-family: sans-serif;
+            font-size: 16px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .comment-empty { text-align: center; opacity: 0.7; }
     </style>
     
     <script type="module">
@@ -199,6 +268,96 @@
             msgEl.textContent = "Couldn't load the poll.";
         });
     </script>
+
+    <script type="module">
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+     
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdVqpIxta_MpmzwbDqV3oQQOT5eRTrePo",
+            authDomain: "channel-name-e4100.firebaseapp.com",
+            projectId: "channel-name-e4100",
+            storageBucket: "channel-name-e4100.firebasestorage.app",
+            messagingSenderId: "1048964398169",
+            appId: "1:1048964398169:web:8cf28f116c607ea9cc8548"
+        };
+     
+        const COOLDOWN_SECONDS = 30;   // wait time between comments from the same browser
+        const SHOW_LAST = 50;          // how many comments to show
+     
+        // Reuses the app the poll already created, or makes one if the poll isn't on this page
+        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const commentsRef = collection(db, "comments");
+     
+        const form = document.getElementById("comment-form");
+        const nameEl = document.getElementById("comment-name");
+        const textEl = document.getElementById("comment-text");
+        const btn = document.getElementById("comment-btn");
+        const statusEl = document.getElementById("comment-status");
+        const listEl = document.getElementById("comment-list");
+     
+        try { nameEl.value = localStorage.getItem("ktdacoconut_comment_name") || ""; } catch (e) {}
+     
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const name = nameEl.value.trim();
+            const text = textEl.value.trim();
+            if (!name || !text) return;
+     
+            let last = 0;
+            try { last = Number(localStorage.getItem("ktdacoconut_comment_last") || 0); } catch (err) {}
+            const wait = Math.ceil(COOLDOWN_SECONDS - (Date.now() - last) / 1000);
+            if (wait > 0) { statusEl.textContent = "Please wait " + wait + "s before posting again."; return; }
+     
+            btn.disabled = true;
+            statusEl.textContent = "Posting...";
+            try {
+                await addDoc(commentsRef, { name, text, createdAt: serverTimestamp() });
+                textEl.value = "";
+                statusEl.textContent = "Posted!";
+                try {
+                    localStorage.setItem("ktdacoconut_comment_last", String(Date.now()));
+                    localStorage.setItem("ktdacoconut_comment_name", name);
+                } catch (err) {}
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = "Couldn't post. Try again later.";
+            }
+            btn.disabled = false;
+        });
+     
+        const q = query(commentsRef, orderBy("createdAt", "desc"), limit(SHOW_LAST));
+        onSnapshot(q, (snap) => {
+            listEl.textContent = "";
+            if (snap.empty) {
+                const p = document.createElement("p");
+                p.className = "comment-empty";
+                p.textContent = "No comments yet. Be the first!";
+                listEl.appendChild(p);
+                return;
+            }
+            snap.forEach((d) => {
+                const c = d.data();
+                const box = document.createElement("div");
+                box.className = "comment";
+                const who = document.createElement("span");
+                who.className = "who";
+                who.textContent = c.name;                       // textContent keeps visitors from injecting HTML
+                const when = document.createElement("span");
+                when.className = "when";
+                if (c.createdAt) when.textContent = c.createdAt.toDate().toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+                const msg = document.createElement("p");
+                msg.className = "msg";
+                msg.textContent = c.text;
+                box.append(who, when, msg);
+                listEl.appendChild(box);
+            });
+        }, (err) => {
+            console.error(err);
+            listEl.textContent = "Couldn't load comments.";
+        });
+    </script>
     
     <header class="banner">
         <div>
@@ -222,6 +381,17 @@
             <div id="poll-options"></div>
             <div class="poll-total" id="poll-total"></div>
             <div class="poll-msg" id="poll-msg"></div>
+        </div>
+
+        <div class="comments" id="comments">
+            <h2>Comments</h2>
+            <form id="comment-form">
+                <input id="comment-name" type="text" placeholder="Your name" maxlength="30" required>
+                <textarea id="comment-text" placeholder="Write a comment..." maxlength="500" required></textarea>
+                <button type="submit" id="comment-btn">Post</button>
+                <span class="comment-status" id="comment-status"></span>
+            </form>
+            <div class="comment-list" id="comment-list"></div>
         </div>
 
     </body>
