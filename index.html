@@ -188,6 +188,25 @@
             word-wrap: break-word;
         }
         .comment-empty { text-align: center; opacity: 0.7; }
+
+        .extras {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .extras .poll,
+        .extras .comments {
+            flex: 1 1 400px;
+            margin: 0;
+            max-width: none;
+            box-sizing: border-box;
+        }
     </style>
     
     <script type="module">
@@ -343,7 +362,7 @@
                 box.className = "comment";
                 const who = document.createElement("span");
                 who.className = "who";
-                who.textContent = c.name;                       // textContent keeps visitors from injecting HTML
+                who.textContent = c.name;                       
                 const when = document.createElement("span");
                 when.className = "when";
                 if (c.createdAt) when.textContent = c.createdAt.toDate().toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
@@ -375,23 +394,28 @@
             <img src="dancing_coconut_transparent.webp" alt="Logo">
             <p>Hello! I am KTdaCOCONUT. I am a small youtube that does different types of content, but focuses on gaming. I try to upload frequently, but it doesn't always happen. I love to make youtube videos to show my interest and feel a sense of accomplishment. It would be greatly appriciated if you susbscribe. Thanks for the support!</p>
         </div>
-        
-        <div class="poll" id="poll">
-            <h2>Vote for my name?</h2>
-            <div id="poll-options"></div>
-            <div class="poll-total" id="poll-total"></div>
-            <div class="poll-msg" id="poll-msg"></div>
-        </div>
 
-        <div class="comments" id="comments">
-            <h2>Comments</h2>
-            <form id="comment-form">
-                <input id="comment-name" type="text" placeholder="Your name" maxlength="30" required>
-                <textarea id="comment-text" placeholder="Write a comment..." maxlength="500" required></textarea>
-                <button type="submit" id="comment-btn">Post</button>
-                <span class="comment-status" id="comment-status"></span>
-            </form>
-            <div class="comment-list" id="comment-list"></div>
+
+        <div class="extras" id="extras">
+        
+            <div class="poll" id="poll">
+                <h2>Vote for my name?</h2>
+                <div id="poll-options"></div>
+                <div class="poll-total" id="poll-total"></div>
+                <div class="poll-msg" id="poll-msg"></div>
+            </div>
+    
+            <div class="comments" id="comments">
+                <h2>Comments</h2>
+                <form id="comment-form">
+                    <input id="comment-name" type="text" placeholder="Your name" maxlength="30" required>
+                    <textarea id="comment-text" placeholder="Write a comment..." maxlength="500" required></textarea>
+                    <button type="submit" id="comment-btn">Post</button>
+                    <span class="comment-status" id="comment-status"></span>
+                </form>
+                <div class="comment-list" id="comment-list"></div>
+            </div>
+            
         </div>
 
     </body>
