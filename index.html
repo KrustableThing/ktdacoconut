@@ -235,7 +235,41 @@
         .comments .reply-form textarea { min-height: 60px; }
         .comments .reply-form button { padding: 8px 20px; font-size: 14px; }
         .comments .reply-form button + button { margin-left: 8px; }
- 
+
+        /*Video*/
+        /* VIDEO */
+        .video {
+            text-align: center;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .video p {
+            font-family: "Road Rage", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 50px;
+            color: white;
+            margin: 0 0 20px;
+            text-shadow: 0 0 10px #ff00cc, 0 0 20px #ff00cc;
+        }
+        .video-frame {
+            box-sizing: border-box;
+            width: min(360px, 100%);
+            aspect-ratio: 9 / 16;           /* vertical, like a YouTube Short */
+            margin: 0 auto;
+            border: 4px solid #00f0ff;
+            border-radius: 20px;
+            box-shadow: 0 0 15px #00f0ff, 0 0 30px #ff00cc;
+            overflow: hidden;
+            background: black;
+        }
+        .video-frame iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
     </style>
     
     <script type="module">
@@ -544,6 +578,19 @@
             <img src="dancing_coconut_transparent.webp" alt="Logo">
             <p>Hello! I am KTdaCOCONUT. I am a small youtube that does different types of content, but focuses on gaming. I try to upload frequently, but it doesn't always happen. I love to make youtube videos to show my interest and feel a sense of accomplishment. It would be greatly appriciated if you susbscribe. Thanks for the support!</p>
         </div>
+
+        <div class="video">
+            <p>My Favorite Video</p>
+            <div class="video-frame">
+                <iframe
+                    src="https://www.youtube.com/embed/ApGnTBCuMS8"
+                    title="My favorite video"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen></iframe>
+            </div>
+        <div>
 
 
         <div class="extras" id="extras">
